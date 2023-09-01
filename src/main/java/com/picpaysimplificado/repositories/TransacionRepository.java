@@ -7,9 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserRepository, Long> {
-
-    Optional<User> findUserByEmail(String email);
-    Optional<User> findUserByDocument(String document);
+public interface TransacionRepository extends JpaRepository<TransacionRepository, Long> {
 
 }
