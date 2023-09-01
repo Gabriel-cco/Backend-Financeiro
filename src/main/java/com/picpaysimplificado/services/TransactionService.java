@@ -6,7 +6,6 @@ import com.picpaysimplificado.dtos.TransactionDTO;
 import com.picpaysimplificado.repositories.TransacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -24,26 +23,32 @@ public class TransactionService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private NotificationService notificationService;
 
-    private void createTransaction(TransactionDTO transaction){
-        User send = userService.findById(transaction.senderId());
-        User receiver = userService.findById(transaction.receiverId());
-        userService.validadedTransaction(send, transaction.value());
-        boolean isAuthorized = authorizationTransaction(send, transaction.value());
+    public Transaction createTransaction(TransactionDTO transaction){
+        User send = userService.findById(transaction.sender());
+        User receiver = userService.findById(transaction.receiver());
+        userService.validadedTransaction(send, transaction.amount());
+        boolean isAuthorized = authorizationTransaction(send, transaction.amount());
         if(!isAuthorized){
             throw new RuntimeException("Transação não autorizada");
         }
         Transaction transactionSave = Transaction.builder()
-                .amount(transaction.value())
+                .amount(transaction.amount())
                 .sender(send)
                 .receiver(receiver)
                 .build();
 
-        send.setBalance(send.getBalance().subtract(transaction.value()));
-        receiver.setBalance(receiver.getBalance().add(transaction.value()));
+        send.setBalance(send.getBalance().subtract(transaction.amount()));
+        receiver.setBalance(receiver.getBalance().add(transaction.amount()));
         repository.save(transactionSave);
         userService.save(send);
         userService.save(receiver);
+/*        notificationService.sendNotification(send, "Transação relizada com sucesso");
+        notificationService.sendNotification(receiver, "Transação relizada com sucesso");*/
+        return transactionSave;
+
     }
 
     private boolean authorizationTransaction(User sender, BigDecimal value){

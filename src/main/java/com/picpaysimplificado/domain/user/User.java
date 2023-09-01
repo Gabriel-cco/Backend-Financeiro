@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 public class User {
 
@@ -18,7 +19,7 @@ public class User {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
         private String firtsName;
-        private String lastname;
+        private String lastName;
         @Column(unique = true)
         private String email;
         @Column(unique = true)
@@ -27,4 +28,5 @@ public class User {
         private BigDecimal balance;
         @Enumerated(EnumType.STRING)
         private UserTypeEnum userType;
+
 }
